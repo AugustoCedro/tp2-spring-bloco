@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: tp1-pb-sb
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgredb
+    username: adm
+    password: adm
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+  main:
+    allow-bean-definition-overriding: true
