@@ -34,17 +34,17 @@ public interface AdventurerRepository extends JpaRepository<Adventurer,Long> {
     Optional<Adventurer> findByIdAndOrganizationId(Long adventurerId, Long id);
 
     @Query("""
-    SELECT a FROM Adventurer a
-    LEFT JOIN a.participations p
-    LEFT JOIN p.mission m
-    WHERE (:status IS NULL OR m.missionStatus = :status)
-      AND (:startDate IS NULL OR m.createdAt >= :startDate)
-      AND (:endDate IS NULL OR m.createdAt <= :endDate)
-    GROUP BY a
-    ORDER BY 
-        COUNT(p) DESC,
-        COALESCE(SUM(p.rewardInGold), 0) DESC,
-        COALESCE(SUM(CASE WHEN p.mvp = true THEN 1 ELSE 0 END), 0) DESC
+        SELECT a FROM Adventurer a
+        LEFT JOIN a.participations p
+        LEFT JOIN p.mission m
+        WHERE (CAST(:status AS string) IS NULL OR m.missionStatus = :status)
+          AND (CAST(:startDate AS date) IS NULL OR m.createdAt >= :startDate)
+          AND (CAST(:endDate AS date) IS NULL OR m.createdAt <= :endDate)
+        GROUP BY a
+        ORDER BY 
+            COUNT(p) DESC,
+            COALESCE(SUM(p.rewardInGold), 0) DESC,
+            COALESCE(SUM(CASE WHEN p.mvp = true THEN 1 ELSE 0 END), 0) DESC
 """)
     Page<Adventurer> findRanking(
             @Param("status") MissionStatus status,
