@@ -1,6 +1,10 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.*;
+import com.example.demo.exceptions.AdventurerAlreadyHasCompanionException;
+import com.example.demo.exceptions.InvalidEnumValueException;
+import com.example.demo.exceptions.OrganizationNotFoundException;
+import com.example.demo.exceptions.UserNotFoundException;
 import com.example.demo.mapper.AdventurerMapper;
 import com.example.demo.model.adventure.*;
 import com.example.demo.model.audit.Organization;
@@ -34,12 +38,12 @@ public class AdventurerService {
     public Adventurer register(AdventurerRequestDTO dto) {
         Organization organization = organizationRepository
                 .findByNameIgnoreCase(dto.organization())
-                .orElseThrow(() -> new IllegalArgumentException("organization not found"));
+                .orElseThrow(() -> new OrganizationNotFoundException("Organization '" + dto.organization() + "' not found"));
 
         User user = organization.getUsers().stream()
                 .filter(u -> u.getEmail().equals(dto.user()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("User" + dto.user() + " not found"));
+                .orElseThrow(() -> new UserNotFoundException("User '" + dto.user() + "' not found"));
 
         Adventurer adventurer = new Adventurer(dto.level(), Category.valueOf(dto.category().toUpperCase()),dto.name(),user,organization);
         organization.getAdventurers().add(adventurer);
@@ -53,7 +57,15 @@ public class AdventurerService {
         Category categoryEnum = category != null ?
                 Arrays.stream(Category.values())
                         .filter(d -> d.name().equalsIgnoreCase(category))
-                        .findFirst().orElseThrow(() -> new IllegalArgumentException("Invalid Category")) : null;
+                        .findFirst()
+                        .orElseThrow(() -> new InvalidEnumValueException(
+                                "Category",
+                                Arrays
+                                .stream(Category.values())
+                                .map(Enum::name)
+                                .toList()
+                        ))
+                : null;
 
         Page<Adventurer> adventurers = adventurerRepository.findWithFilters(active,categoryEnum,minLevel,pageRequest);
 
@@ -69,18 +81,23 @@ public class AdventurerService {
     }
 
     public AdventurerSearchResponseDTO registerCompanion(Long adventurerId, CompanionRequestDTO dto) {
-       Adventurer adventurer = adventurerRepository.findById(adventurerId).orElseThrow(() -> new IllegalArgumentException("Adventurer not found"));
+       Adventurer adventurer = adventurerRepository.findById(adventurerId)
+               .orElseThrow(() -> new UserNotFoundException("User with ID: '" + adventurerId + "' not found"));
 
         Optional.ofNullable(adventurer.getCompanion())
                 .ifPresent(c -> {
-                    throw new IllegalArgumentException("Adventurer already has a companion");
+                    throw new AdventurerAlreadyHasCompanionException("Adventurer '" + adventurer.getName() + "' already has a companion");
                 });
 
         Specie specie = Arrays.stream(Specie.values())
                 .filter(s -> s.name()
                 .equalsIgnoreCase(dto.specie()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Invalid specie"));
+                .orElseThrow(() -> new InvalidEnumValueException("Specie",
+                        Arrays
+                        .stream(Specie.values())
+                        .map(Enum::name)
+                        .toList()));
 
         Companion companion = new Companion(dto.name(),specie, random.nextInt(100),adventurer);
         adventurer.setCompanion(companion);
@@ -91,7 +108,8 @@ public class AdventurerService {
     }
 
     public AdventurerDetailsResponseDTO listAdventurerById(Long adventurerId){
-        Adventurer adventurer = adventurerRepository.findById(adventurerId).orElseThrow(() -> new IllegalArgumentException("Adventurer not found"));
+        Adventurer adventurer = adventurerRepository.findById(adventurerId)
+                .orElseThrow(() -> new UserNotFoundException("User with ID: '" + adventurerId + "' not found"));
         MissionResponseDTO missionDTO = missionService.getAdventurerLastMission(adventurerId);
         return adventurerMapper.toAdventurerDetailsResponseDTO(adventurer,missionDTO);
     }
@@ -103,7 +121,12 @@ public class AdventurerService {
         MissionStatus missionStatusEnum = missionStatus != null ?
                 Arrays.stream(MissionStatus.values())
                         .filter(m -> m.name().equalsIgnoreCase(missionStatus))
-                        .findFirst().orElseThrow(() -> new IllegalArgumentException("Invalid MissionStatus")) : null;
+                        .findFirst().orElseThrow(() -> new InvalidEnumValueException("Mission Status",
+                                Arrays
+                                .stream(MissionStatus.values())
+                                        .map(Enum::name)
+                                        .toList()))
+                : null;
 
         Page<Adventurer> adventurers = adventurerRepository.findRanking(missionStatusEnum,startDate,endDate,pageRequest);
         return adventurers.map(a -> adventurerMapper.toAdventurerDetailsResponseDTO(a,missionService.getAdventurerLastMission(a.getId())));

@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.*;
+import com.example.demo.exceptions.*;
 import com.example.demo.mapper.AdventurerMapper;
 import com.example.demo.mapper.MissionMapper;
 import com.example.demo.model.adventure.*;
@@ -35,11 +36,11 @@ public class MissionService {
     public Mission register(MissionRequestDTO dto) {
         Organization organization = organizationRepository
                 .findByNameIgnoreCase(dto.organization())
-                .orElseThrow(() -> new IllegalArgumentException("organization not found"));
+                .orElseThrow(() -> new OrganizationNotFoundException("organization not found"));
 
         missionRepository.findByTitleIgnoreCase(dto.title()).ifPresent(m ->
         {
-            throw new IllegalArgumentException("Mission Name already registered");
+            throw new MissionAlreadyRegisteredException("Mission Name already registered");
         });
 
         Mission mission = new Mission(organization, dto.title(), generateRandomDangerLevel(),generateRandomMissionStatus(), DateRandomizer.randomDate());
@@ -55,13 +56,13 @@ public class MissionService {
     public MissionDetailsResponseDTO registerParticipant(Long missionId, Long adventurerId) {
         Mission mission = missionRepository
                 .findById(missionId)
-                .orElseThrow(() -> new IllegalArgumentException("Mission not found"));
+                .orElseThrow(() -> new MissionNotFoundException("Mission not found"));
 
         validateMissionStatus(mission);
 
         Adventurer adventurer = adventurerRepository
                 .findByIdAndOrganizationId(adventurerId, mission.getOrganization().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Adventurer not found in this organization"));
+                .orElseThrow(() -> new AdventurerNotFoundException("Adventurer not found in this organization"));
 
         validateAdventurerActive(adventurer);
 
@@ -70,7 +71,7 @@ public class MissionService {
                 .filter(p -> p.getAdventurer().equals(adventurer))
                 .findFirst()
                 .ifPresent(p -> {
-                    throw new IllegalArgumentException("Adventurer already in this mission");
+                    throw new AdventurerAlreadyInThisMissionException("Adventurer already in this mission");
                 });
 
         MissionParticipation participation = new MissionParticipation(mission,adventurer,generateRandomMissionRole(), random.nextInt(1500) + 1);
@@ -89,12 +90,22 @@ public class MissionService {
         DangerLevel dangerLevelEnum = dangerLevel != null ?
                 Arrays.stream(DangerLevel.values())
                 .filter(d -> d.name().equalsIgnoreCase(dangerLevel))
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("Invalid DangerLevel")) : null;
+                .findFirst().orElseThrow(() -> new InvalidEnumValueException("DangerLevel",
+                                Arrays
+                                        .stream(DangerLevel.values())
+                                        .map(Enum::name)
+                                        .toList()))
+                : null;
 
         MissionStatus missionStatusEnum = missionStatus != null ?
                 Arrays.stream(MissionStatus.values())
-                .filter(m -> m.name().equalsIgnoreCase(missionStatus))
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("Invalid MissionStatus")) : null;
+                        .filter(m -> m.name().equalsIgnoreCase(missionStatus))
+                        .findFirst().orElseThrow(() -> new InvalidEnumValueException("Mission Status",
+                                Arrays
+                                        .stream(MissionStatus.values())
+                                        .map(Enum::name)
+                                        .toList()))
+                : null;
 
         Page<Mission> missions  = missionRepository.findWithFilters(missionStatusEnum,dangerLevelEnum,startDate,endDate,pageRequest);
 
@@ -110,7 +121,7 @@ public class MissionService {
     }
 
     public MissionDetailsResponseDTO listMissionById(Long missionId) {
-        Mission mission = missionRepository.findById(missionId).orElseThrow(() -> new IllegalArgumentException("Mission not Found"));
+        Mission mission = missionRepository.findById(missionId).orElseThrow(() -> new MissionNotFoundException("Mission not Found"));
         return missionMapper.toMissionDetailsResponseDTO(mission,adventurerMapper);
     }
 
@@ -128,12 +139,12 @@ public class MissionService {
     }
     private void validateMissionStatus(Mission mission){
         if(mission.getMissionStatus() != MissionStatus.EM_ANDAMENTO && mission.getMissionStatus() != MissionStatus.PLANEJADA){
-            throw new IllegalArgumentException("Cannot add adventurer in this mission status");
+            throw new MissionStatusAdventurerException("Cannot add adventurer in this mission status");
         }
     }
     private void validateAdventurerActive(Adventurer adventurer) {
         if (!adventurer.getActive()) {
-            throw new IllegalArgumentException("Adventurer is inactive");
+            throw new AdventurerIsInactiveException("Adventurer is inactive");
         }
     }
 

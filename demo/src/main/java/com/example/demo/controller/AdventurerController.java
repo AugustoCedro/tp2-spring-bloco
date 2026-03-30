@@ -10,6 +10,7 @@ import jakarta.websocket.server.PathParam;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,23 +28,23 @@ public class AdventurerController {
     @PostMapping
     public ResponseEntity<Adventurer> registerAdventurer(@RequestBody @Valid AdventurerRequestDTO dto){
         Adventurer adventurer = service.register(dto);
-        return ResponseEntity.ok().body(adventurer);
+        return ResponseEntity.status(HttpStatus.CREATED).body(adventurer);
     }
 
     @PostMapping("/{adventurerId}/companheiros")
     public ResponseEntity<AdventurerSearchResponseDTO> registerAdventurerCompanion(@PathVariable Long adventurerId,@RequestBody @Valid CompanionRequestDTO dto){
         AdventurerSearchResponseDTO adventurerDTO = service.registerCompanion(adventurerId,dto);
-        return ResponseEntity.ok().body(adventurerDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(adventurerDTO);
     }
 
     @GetMapping
     public Page<AdventurerResponseDTO> listingAdventurers(
             @RequestHeader(value = "X-Page",required = false,defaultValue = "0")
-            @Min(value = 0, message = "Page não pode ser negativa")
+            @Min(value = 0, message = "Page cannot be negative.")
             int page,
             @RequestHeader(value = "X-Size",required = false, defaultValue = "10")
-            @Min(value = 1, message = "Size deve ser no mínimo 1")
-            @Max(value = 50, message = "Size deve ser no máximo 50")
+            @Min(value = 1, message = "Size must be at least 1.")
+            @Max(value = 50, message = "Size should be a maximum of 50.")
             int size,
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) String category,
@@ -55,11 +56,11 @@ public class AdventurerController {
     @GetMapping("/buscar")
     public Page<AdventurerSearchResponseDTO> listingAdventurersByName(
             @RequestHeader(value = "X-Page",required = false,defaultValue = "0")
-            @Min(value = 0, message = "Page não pode ser negativa")
+            @Min(value = 0, message = "Page cannot be negative.")
             int page,
             @RequestHeader(value = "X-Size",required = false, defaultValue = "10")
-            @Min(value = 1, message = "Size deve ser no mínimo 1")
-            @Max(value = 50, message = "Size deve ser no máximo 50")
+            @Min(value = 1, message = "Size must be at least 1.")
+            @Max(value = 50, message = "Size should be a maximum of 50.")
             int size,
             @RequestParam(required = true) String name
     ){
@@ -73,13 +74,13 @@ public class AdventurerController {
     }
 
     @GetMapping("/ranking")
-    public Page<AdventurerDetailsResponseDTO> listingAdventurersByName(
+    public Page<AdventurerDetailsResponseDTO> listingAdventurersRanking(
             @RequestHeader(value = "X-Page",required = false,defaultValue = "0")
-            @Min(value = 0, message = "Page não pode ser negativa")
+            @Min(value = 0, message = "Page cannot be negative.")
             int page,
             @RequestHeader(value = "X-Size",required = false, defaultValue = "10")
-            @Min(value = 1, message = "Size deve ser no mínimo 1")
-            @Max(value = 50, message = "Size deve ser no máximo 50")
+            @Min(value = 1, message = "Size must be at least 1.")
+            @Max(value = 50, message = "Size should be a maximum of 50.")
             int size,
             @RequestParam(required = false) String missionStatus,
             @RequestParam(required = false) LocalDate startDate,
