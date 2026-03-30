@@ -43,7 +43,7 @@ public class MissionController {
     }
 
     @GetMapping
-    public Page<MissionResponseDTO> listingMissions(
+    public Page<MissionResponseDTO> listingMissionsWithFilters(
             @RequestHeader(value = "X-Page",required = false,defaultValue = "0")
             @Min(value = 0, message = "Page cannot be negative.")
             int page,
@@ -56,11 +56,11 @@ public class MissionController {
             @RequestParam(required = false) LocalDate startDate,
             @RequestParam(required = false) LocalDate endDate
     ){
-        return service.listMissions(missionStatus,dangerLevel,startDate,endDate,size,page);
+        return service.listMissionsWithFilters(missionStatus,dangerLevel,startDate,endDate,size,page);
     }
 
     @GetMapping("/{missionId}")
-    public ResponseEntity<MissionDetailsResponseDTO> listMission(@PathVariable Long missionId){
+    public ResponseEntity<MissionDetailsResponseDTO> listMissionById(@PathVariable Long missionId){
         MissionDetailsResponseDTO missionDTO = service.listMissionById(missionId);
         return ResponseEntity.ok().body(missionDTO);
     }

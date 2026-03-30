@@ -59,9 +59,8 @@ public class Mission {
         this.organization = organization;
         this.title = title;
         this.dangerLevel = dangerLevel;
-        this.createdAt = createdAt;
         this.missionStatus = missionStatus;
-
+        this.createdAt = createdAt;
         missionStatus.apply(this);
     }
 }

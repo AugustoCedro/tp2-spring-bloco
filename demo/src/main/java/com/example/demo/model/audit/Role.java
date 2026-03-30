@@ -8,7 +8,8 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
-@Table(name = "roles",schema = "audit", uniqueConstraints = @UniqueConstraint(columnNames = {"organizacao_id","nome"}))
+@Table(name = "roles",schema = "audit", uniqueConstraints =
+@UniqueConstraint(columnNames = {"organizacao_id","nome"}))
 @Getter
 @Setter
 @AllArgsConstructor
@@ -44,5 +45,4 @@ public class Role {
     )
     @JsonIgnore
     private Set<Permission> permissions;
-
 }

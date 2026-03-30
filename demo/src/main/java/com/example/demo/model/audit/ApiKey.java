@@ -6,7 +6,8 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Table(name = "api_keys",schema = "audit",uniqueConstraints = @UniqueConstraint(columnNames = {"organizacao_id","nome"}))
+@Table(name = "api_keys",schema = "audit",uniqueConstraints =
+@UniqueConstraint(columnNames = {"organizacao_id","nome"}))
 @Entity
 @Getter
 @Setter

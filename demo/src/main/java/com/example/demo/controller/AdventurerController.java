@@ -6,9 +6,7 @@ import com.example.demo.service.AdventurerService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.websocket.server.PathParam;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +36,7 @@ public class AdventurerController {
     }
 
     @GetMapping
-    public Page<AdventurerResponseDTO> listingAdventurers(
+    public Page<AdventurerResponseDTO> listingAdventurersWithFilters(
             @RequestHeader(value = "X-Page",required = false,defaultValue = "0")
             @Min(value = 0, message = "Page cannot be negative.")
             int page,
@@ -50,7 +48,7 @@ public class AdventurerController {
             @RequestParam(required = false) String category,
             @RequestParam(required = false) Integer minLevel
     ){
-        return service.listAdventurers(active,category,minLevel,size,page);
+        return service.listAdventurersWithFilters(active,category,minLevel,size,page);
     }
 
     @GetMapping("/buscar")
@@ -68,7 +66,7 @@ public class AdventurerController {
     }
 
     @GetMapping("/{adventurerId}")
-    public ResponseEntity<AdventurerDetailsResponseDTO> listAdventurer(@PathVariable Long adventurerId){
+    public ResponseEntity<AdventurerDetailsResponseDTO> listAdventurerById(@PathVariable Long adventurerId){
         AdventurerDetailsResponseDTO adventurerDTO = service.listAdventurerById(adventurerId);
         return ResponseEntity.ok().body(adventurerDTO);
     }

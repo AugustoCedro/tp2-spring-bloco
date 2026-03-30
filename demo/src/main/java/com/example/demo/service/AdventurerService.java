@@ -51,7 +51,7 @@ public class AdventurerService {
         return adventurer;
     }
 
-    public Page<AdventurerResponseDTO> listAdventurers(Boolean active, String category, Integer minLevel, int size, int page) {
+    public Page<AdventurerResponseDTO> listAdventurersWithFilters(Boolean active, String category, Integer minLevel, int size, int page) {
         PageRequest pageRequest = PageRequest.of(page,size, Sort.by("level").ascending());
 
         Category categoryEnum = category != null ?

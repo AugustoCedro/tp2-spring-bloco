@@ -84,7 +84,7 @@ public class MissionService {
     }
 
 
-    public Page<MissionResponseDTO> listMissions(String missionStatus, String dangerLevel, LocalDate startDate,LocalDate endDate,int size,int page) {
+    public Page<MissionResponseDTO> listMissionsWithFilters(String missionStatus, String dangerLevel, LocalDate startDate,LocalDate endDate,int size,int page) {
         PageRequest pageRequest = PageRequest.of(page,size, Sort.by("startedAt").ascending());
 
         DangerLevel dangerLevelEnum = dangerLevel != null ?

@@ -49,14 +49,4 @@ public class Organization {
     @OneToMany(mappedBy = "organization")
     @JsonIgnore
     private List<Mission> missions;
-
-    @Override
-    public String toString() {
-        return "Organization{" +
-                "active=" + active +
-                ", name='" + name + '\'' +
-                ", id=" + id +
-                ", missions=" + missions +
-                '}';
-    }
 }
