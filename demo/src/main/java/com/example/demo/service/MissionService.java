@@ -6,10 +6,7 @@ import com.example.demo.mapper.AdventurerMapper;
 import com.example.demo.mapper.MissionMapper;
 import com.example.demo.model.adventure.*;
 import com.example.demo.model.audit.Organization;
-import com.example.demo.repository.AdventurerRepository;
-import com.example.demo.repository.MissionParticipationRepository;
-import com.example.demo.repository.MissionRepository;
-import com.example.demo.repository.OrganizationRepository;
+import com.example.demo.repository.*;
 import com.example.demo.util.DateRandomizer;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,7 +16,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Random;
+
+import static org.antlr.v4.runtime.tree.xpath.XPath.findAll;
 
 @Service
 @AllArgsConstructor
@@ -33,6 +34,7 @@ public class MissionService {
     private final MissionMapper missionMapper;
     private final AdventurerMapper adventurerMapper;
 
+
     public Mission register(MissionRequestDTO dto) {
         Organization organization = organizationRepository
                 .findByNameIgnoreCase(dto.organization())
@@ -43,7 +45,7 @@ public class MissionService {
             throw new MissionAlreadyRegisteredException("Mission Name already registered");
         });
 
-        Mission mission = new Mission(organization, dto.title(), generateRandomDangerLevel(),generateRandomMissionStatus(), DateRandomizer.randomDate());
+        Mission mission = new Mission(organization, dto.title(), generateRandomDangerLevel(),generateRandomMissionStatus(), DateRandomizer.randomDateTime());
         organization.getMissions().add(mission);
         missionRepository.save(mission);
         return mission;
@@ -74,7 +76,7 @@ public class MissionService {
                     throw new AdventurerAlreadyInThisMissionException("Adventurer already in this mission");
                 });
 
-        MissionParticipation participation = new MissionParticipation(mission,adventurer,generateRandomMissionRole(), random.nextInt(1500) + 1);
+        MissionParticipation participation = new MissionParticipation(mission,adventurer,generateRandomMissionRole(), random.nextInt(1500) + 1,generateRandomMvp());
 
         mission.getParticipations().add(participation);
         adventurer.getParticipations().add(participation);
@@ -125,6 +127,14 @@ public class MissionService {
         return missionMapper.toMissionDetailsResponseDTO(mission,adventurerMapper);
     }
 
+
+    public MissionResponseDTO getAdventurerLastMission(Long adventurerId){
+        return missionParticipationRepository
+                .findTopByAdventurerIdOrderByMissionCreatedAtDesc(adventurerId)
+                .map(p -> missionMapper.toMissionResponseDTO(p.getMission()))
+                .orElse(null);
+    }
+
     private DangerLevel generateRandomDangerLevel(){
         DangerLevel[] values = DangerLevel.values();
         return values[random.nextInt(values.length)];
@@ -137,6 +147,11 @@ public class MissionService {
         MissionRole[] values = MissionRole.values();
         return values[random.nextInt(values.length)];
     }
+
+    private Boolean generateRandomMvp() {
+        return Math.random() < 0.5;
+    }
+
     private void validateMissionStatus(Mission mission){
         if(mission.getMissionStatus() != MissionStatus.EM_ANDAMENTO && mission.getMissionStatus() != MissionStatus.PLANEJADA){
             throw new MissionStatusAdventurerException("Cannot add adventurer in this mission status");
@@ -146,13 +161,6 @@ public class MissionService {
         if (!adventurer.getActive()) {
             throw new AdventurerIsInactiveException("Adventurer is inactive");
         }
-    }
-
-    public MissionResponseDTO getAdventurerLastMission(Long adventurerId){
-        return missionParticipationRepository
-                .findTopByAdventurerIdOrderByMissionCreatedAtDesc(adventurerId)
-                .map(p -> missionMapper.toMissionResponseDTO(p.getMission()))
-                .orElse(null);
     }
 
 

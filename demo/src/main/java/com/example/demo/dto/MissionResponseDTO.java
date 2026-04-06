@@ -14,8 +14,8 @@ public record MissionResponseDTO(
         String title,
         DangerLevel dangerLevel,
         MissionStatus missionStatus,
-        LocalDate createdAt,
-        LocalDate startedAt,
-        LocalDate finishedAt
+        LocalDateTime createdAt,
+        LocalDateTime startedAt,
+        LocalDateTime finishedAt
 ) {
 }

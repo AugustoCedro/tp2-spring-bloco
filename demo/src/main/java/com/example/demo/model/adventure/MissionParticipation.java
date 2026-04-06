@@ -41,12 +41,12 @@ public class MissionParticipation {
     @Column(name = "register_date",nullable = false)
     private LocalDateTime registerDate;
 
-    public MissionParticipation(Mission mission, Adventurer adventurer, MissionRole missionRole, Integer rewardInGold) {
+    public MissionParticipation(Mission mission, Adventurer adventurer, MissionRole missionRole, Integer rewardInGold, Boolean mvp) {
         this.mission = mission;
         this.adventurer = adventurer;
         this.missionRole = missionRole;
         this.rewardInGold = rewardInGold;
-        this.mvp = false;
+        this.mvp = mvp;
         this.registerDate = LocalDateTime.now();
     }
 }

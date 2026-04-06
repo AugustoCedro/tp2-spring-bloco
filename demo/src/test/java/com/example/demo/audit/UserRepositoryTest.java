@@ -1,7 +1,5 @@
-package com.example.demo;
+package com.example.demo.audit;
 
-import com.example.demo.model.audit.Organization;
-import com.example.demo.model.audit.User;
 import com.example.demo.repository.AdventurerRepository;
 import com.example.demo.repository.OrganizationRepository;
 import com.example.demo.repository.RoleRepository;

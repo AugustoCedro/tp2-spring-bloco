@@ -38,13 +38,13 @@ public class Mission {
     private MissionStatus missionStatus;
 
     @Column(name = "created_at",nullable = false)
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "started_at")
-    private LocalDate startedAt;
+    private LocalDateTime startedAt;
 
     @Column(name = "finished_at")
-    private LocalDate finishedAt;
+    private LocalDateTime finishedAt;
 
     @OneToMany(
             mappedBy = "mission",
@@ -55,7 +55,7 @@ public class Mission {
     private List<MissionParticipation> participations;
 
 
-    public Mission(Organization organization, String title, DangerLevel dangerLevel, MissionStatus missionStatus, LocalDate createdAt) {
+    public Mission(Organization organization, String title, DangerLevel dangerLevel, MissionStatus missionStatus, LocalDateTime createdAt) {
         this.organization = organization;
         this.title = title;
         this.dangerLevel = dangerLevel;

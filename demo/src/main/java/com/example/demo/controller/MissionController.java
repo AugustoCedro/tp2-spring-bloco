@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.*;
 import com.example.demo.model.adventure.Mission;
+import com.example.demo.model.adventure.MissionTacticalPanel;
 import com.example.demo.service.MissionService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -14,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/missoes")
@@ -77,6 +79,9 @@ public class MissionController {
     ){
         return service.listMissionsMetrics(size,page);
     }
+
+
+
 
 
 

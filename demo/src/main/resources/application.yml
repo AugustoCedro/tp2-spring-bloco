@@ -2,8 +2,8 @@ spring:
   application:
     name: tp1-pb-sb
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgredb
-    username: adm
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
     password: adm
   jpa:
     hibernate:

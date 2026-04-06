@@ -5,19 +5,23 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.concurrent.ThreadLocalRandom;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.concurrent.ThreadLocalRandom;
+
 public class DateRandomizer {
 
-    public static LocalDate randomDate() {
+    public static LocalDateTime randomDateTime() {
 
-        LocalDate start = LocalDate.of(2025, 1, 1);
-        LocalDate end = LocalDate.of(2026, 2, 28);
+        LocalDateTime start = LocalDateTime.of(2025, 1, 1, 0, 0);
+        LocalDateTime end = LocalDateTime.of(2026, 2, 28, 23, 59, 59);
 
-        long startEpochDay = start.toEpochDay();
-        long endEpochDay = end.toEpochDay();
+        long startEpoch = start.atZone(ZoneId.systemDefault()).toEpochSecond();
+        long endEpoch = end.atZone(ZoneId.systemDefault()).toEpochSecond();
 
-        long randomDay = ThreadLocalRandom.current()
-                .nextLong(startEpochDay, endEpochDay + 1);
+        long randomEpoch = ThreadLocalRandom.current()
+                .nextLong(startEpoch, endEpoch + 1);
 
-        return LocalDate.ofEpochDay(randomDay);
+        return LocalDateTime.ofEpochSecond(randomEpoch, 0, ZoneId.systemDefault().getRules().getOffset(start.atZone(ZoneId.systemDefault()).toInstant()));
     }
 }

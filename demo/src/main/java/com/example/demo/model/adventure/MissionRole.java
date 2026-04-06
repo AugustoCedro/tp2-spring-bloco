@@ -1,7 +1,9 @@
 package com.example.demo.model.adventure;
 
 public enum MissionRole {
-    DPS,
+    ATAQUE,
+    CURANDEIRO,
+    DEFESA,
     SUPORTE,
-    TANK
+    LIDER
 }
